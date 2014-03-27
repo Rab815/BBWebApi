@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrototypeBloombergProcess", "PrototypeBloombergProcess.csproj", "{1536A0FD-9516-432B-AD00-9CFB14CCC290}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloombergGUI2", "..\BloombergGUI2\BloombergGUI2.csproj", "{8B3E1597-6E57-4BB1-8BAC-D5D13BA330F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloombergGUI", "..\BloombergGUI\BloombergGUI.csproj", "{A4DC2E27-267B-4BB2-9387-58333CEA5B15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1536A0FD-9516-432B-AD00-9CFB14CCC290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1536A0FD-9516-432B-AD00-9CFB14CCC290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1536A0FD-9516-432B-AD00-9CFB14CCC290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1536A0FD-9516-432B-AD00-9CFB14CCC290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B3E1597-6E57-4BB1-8BAC-D5D13BA330F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B3E1597-6E57-4BB1-8BAC-D5D13BA330F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B3E1597-6E57-4BB1-8BAC-D5D13BA330F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B3E1597-6E57-4BB1-8BAC-D5D13BA330F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4DC2E27-267B-4BB2-9387-58333CEA5B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4DC2E27-267B-4BB2-9387-58333CEA5B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4DC2E27-267B-4BB2-9387-58333CEA5B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4DC2E27-267B-4BB2-9387-58333CEA5B15}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

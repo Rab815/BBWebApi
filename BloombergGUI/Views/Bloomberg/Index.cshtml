@@ -1,0 +1,138 @@
+﻿@using BloombergGUI.Models
+@using BloombergWebAPICore
+@using BloombergWebAPICore.IWebApi
+@using Core.MVC
+@using Infragistics.Web.Mvc
+
+@model BloombergGUI.Models.SecurityViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    #addIdentifiers {
+        height: 50%; width: 50%; float: left;
+    }
+    #identifierList {
+        width: 50%;
+         height: 50%;
+        float: right;
+    }
+    .validation-summary-errors {
+        color: red;
+    }
+
+</style>
+@*@using (Html.BeginForm("AddIdentifier", "Bloomberg", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))*@
+
+@section addIdentifiers
+{
+    <div id="addIdentifiers">
+        @* @using (Html.BeginForm("AddIdentifier", "Bloomberg", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))*@
+        @using(Html.BeginForm())
+        {
+            @Html.ValidationSummary(true)
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                @Html.LabelFor(m => m.Identifier, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Identifier, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.CrdId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.CrdId, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IdentifierType, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.EnumDropDownListFor(model => model.IdentifierType, Model.IdentifierType)
+                    
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.GoldKey, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.EnumDropDownListFor(model => model.GoldKey, Model.GoldKey)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" class="btn btn-default" name="action" value="Add Identifier" />
+                    <input type="submit" class="btn btn-default" name="action" value="Clear Identifiers" />
+                </div>
+            </div>
+        }
+    </div>
+}
+@section identifierList
+{
+    <div id="identifierList">
+        @using (Html.BeginForm())
+        {
+
+            List<SecurityRequest> tempval = Session["reqs"] as List<SecurityRequest>;
+
+            if (tempval != null)
+            {
+                @Html.ListBox("Identifiers", tempval.Select(item => new SelectListItem() { Text = item.Identifier, Value = item.Identifier }), new { @class = "col-md-2 control-label", @style = "width:200px; height:100px" })
+            }
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" class="btn btn-default" name="action" value="Submit Identifiers" />
+                </div>
+            </div>
+        }
+    </div>
+ } 
+
+@section bbResults
+{
+    
+    <ul>
+        @{
+            if (Model.ResponseContract != null)
+            {
+                foreach (var sec in Model.ResponseContract.SecurityData)
+                {
+                    <li>@sec.Identifier</li>
+                }
+            }
+        }
+    </ul>
+    @if (Model.ResponseContract != null)
+    {
+        var securityList = Model.ResponseContract.SecurityData.Select(m => m).AsQueryable();
+        
+    @(Html.Infragistics().Grid(securityList)
+          .ID("securityList")
+          //.Height("600px")
+          //.Width("100%")
+          //.Width("1500px")
+          .AutoGenerateColumns(false)
+          .AutoGenerateLayouts(false)
+          .FixedHeaders(false)
+          .Columns(column =>
+          {
+              column.For(x => x.Identifier).HeaderText("Identifier").Width("200px");
+              column.For(x => x.CrdId).HeaderText("Broker").Width("200px");
+          })
+        //.Features(features =>
+        //{
+        //    features.Sorting().Type(OpType.Remote);
+        //    features.Paging().Type(OpType.Remote);
+        //    features.Filtering().Type(OpType.Remote);
+        //    features.Responsive().ColumnSettings(cs =>
+        //    {
+        //        cs.ColumnSetting().ColumnKey("CategoryName").Classes("ui-hidden-phone");
+        //        cs.ColumnSetting().ColumnKey("UnitPrice").Classes("ui-hidden-phone ui-hidden-tablet");
+        //    });
+        //})
+        //.DataSourceUrl(Url.Action("GetProducts"))
+        .DataBind()
+        .Render())
+    }
+}
