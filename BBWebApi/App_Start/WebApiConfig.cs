@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace BBWebApi
 {
@@ -11,6 +12,10 @@ namespace BBWebApi
         {
             // enable attribute based routing
             config.MapHttpAttributeRoutes();
+
+            //var cors = new EnableCorsAttribute("*", "*", "*");
+            //config.EnableCors(cors);
+            //config.EnableCors();
 
             //required for model binding polymorphic api calls (use interfaces instead of concrete classes in api calls)
             //config.Formatters.JsonFormatter.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;

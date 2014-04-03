@@ -11,14 +11,12 @@ namespace BloombergGUI.Models
     
     public class SecurityViewModel: IValidatableObject
     {
-        //[Required]
         public string Identifier { get; set; }
-
         public IdentifierType IdentifierType { get; set; }
         public GoldKey GoldKey { get; set; }
         //public bool Validated;
         public string CrdId { get; set; }
-
+        public string FieldsList { get; set; } 
         public ResponseContract ResponseContract { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

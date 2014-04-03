@@ -248,6 +248,8 @@
     <Content Include="Content\Infragistics\css\themes\metro\images\ui-icons_858585_256x240.png" />
     <Content Include="Content\Infragistics\css\themes\metro\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\Infragistics\css\themes\metro\infragistics.theme.css" />
+    <Content Include="Content\themes\base\bootstrap-theme.css" />
+    <Content Include="Content\themes\base\bootstrap.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -280,6 +282,8 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Content\themes\base\jquery.ui.tooltip.css" />
+    <Content Include="Content\themes\base\minified\bootstrap-theme.min.css" />
+    <Content Include="Content\themes\base\minified\bootstrap.min.css" />
     <Content Include="Content\themes\base\minified\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -311,6 +315,9 @@
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
     <Content Include="Global.asax" />
+    <Content Include="Content\themes\base\bootstrap-theme.css.map" />
+    <Content Include="Content\themes\base\bootstrap.css.map" />
+    <None Include="Properties\PublishProfiles\Local.pubxml" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="iggrid-free-ja.html" />
     <Content Include="iggrid-free.html" />
@@ -341,6 +348,8 @@
     <Content Include="Images\Infragistics\Travel_Bus.png" />
     <Content Include="Images\Infragistics\Truck.png" />
     <Content Include="Images\Infragistics\TruckYellow.png" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Infragistics\js\i18n\infragistics-bg.js" />
     <Content Include="Scripts\Infragistics\js\i18n\infragistics-de.js" />
     <Content Include="Scripts\Infragistics\js\i18n\infragistics-es.js" />

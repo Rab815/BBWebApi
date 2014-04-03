@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <title>@ViewBag.Title - Bloomberg Prototype</title>
     <!-- jQuery moved to head due to requirement for Infragistics grid -->
     @Scripts.Render("~/bundles/jquery")
@@ -18,20 +19,27 @@
 
     @Styles.Render("~/Content/foundation/css")
     @Styles.Render("~/Content/css")
+    
+    <!-- Bootstrap -->
+    <link href="~/Content/themes/base/minified/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
 
-    <div class="container body-content">
-        <div style="width:100%">
-            @RenderSection("addIdentifiers", required: false)
 
-            @RenderSection("identifierList", required: false)
+    <div class="container body-content">
+
+        <div class="row">
+            <div class="col-md-4">@RenderSection("addIdentifiers", required: false)</div>
+            <div class="col-md-8">@RenderSection("identifierList", required: false)</div>
         </div>
-        <div style="width:100%; float: left;">
-            @RenderSection("bbResults", required: false)
+        <div class="row">
+            <div class="col-md-12">@RenderSection("bbResults", required: false)</div>
         </div>
         @RenderBody()
     </div>
     @RenderSection("scripts", required: false)
+    
+    <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>

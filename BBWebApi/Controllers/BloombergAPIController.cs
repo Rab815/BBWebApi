@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.Providers.Entities;
 using BBWebApi;
 using Bloomberglp.Blpapi;
@@ -15,7 +16,8 @@ namespace BBWebApi2.Controllers
     public class BloombergApiController : ApiController
     {
         private BloombergApiSessionConfig config = null;
-
+        
+        //[Authorize]
         [AcceptVerbs("POST")]
         [Route("ProcessBloombergRequest")]
         public HttpResponseMessage ProcessBloombergRequest(IRequestContract marshalContract)

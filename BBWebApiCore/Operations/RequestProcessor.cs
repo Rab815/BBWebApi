@@ -213,7 +213,7 @@ namespace BloombergWebAPICore.Operations
                         {
                             var fieldExceptionArray = securityData.GetElement("fieldExceptions");
                             var count =  fieldExceptionArray.NumValues;
-                            for (int j = 0; j < count; ++j)
+                            for (int j = 0; j < count; j++)
                             {
                                 var fieldError = fieldExceptionArray.GetValueAsElement(j);
                                 var errorinfo = fieldError.GetElement("errorInfo");
@@ -335,8 +335,9 @@ namespace BloombergWebAPICore.Operations
 
         public override void ProcessRequest(Session s, IRequestContract requestContract)
         {
-            if (((ReferenceDataRequestContract)requestContract).ReturnEids)
-                request.GetElement("fields").AppendValue("");
+            // Example of having to alter request proior to processing
+            //if (((ReferenceDataRequestContract)requestContract).ReturnEids)
+            //    request.GetElement("fields").AppendValue("");
             base.ProcessRequest(s, requestContract);
         }
     }
