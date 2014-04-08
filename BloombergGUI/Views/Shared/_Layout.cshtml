@@ -9,6 +9,9 @@
     <!-- jQuery moved to head due to requirement for Infragistics grid -->
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/Scripts/jquery.validate.min.js")
+    @Scripts.Render("~/Scripts/jquery.validate.unobtrusive.min.js")
+
 
     @Scripts.Render("~/bundles/modernizr")
     
@@ -28,7 +31,6 @@
 
 
     <div class="container body-content">
-
         <div class="row">
             <div class="col-md-4">@RenderSection("addIdentifiers", required: false)</div>
             <div class="col-md-8">@RenderSection("identifierList", required: false)</div>

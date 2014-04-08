@@ -10,6 +10,21 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{4A7BEF43-765A-4EC4-AA05-4E393572E0BF}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://smamtfs2601a:8080/tfs/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = BBWebApi\\BBWebApi.csproj
+		SccProjectName1 = BBWebApi
+		SccLocalPath1 = BBWebApi
+		SccProjectUniqueName2 = BBWebApiCore\\BBWebApiCore.csproj
+		SccProjectName2 = BBWebApiCore
+		SccLocalPath2 = BBWebApiCore
+		SccProjectUniqueName3 = Core\\Core.csproj
+		SccProjectName3 = Core
+		SccLocalPath3 = Core
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

@@ -41,147 +41,166 @@
         $(".tree").igTree({ hotTracking: false });
         //default to cusip
         $("#IdentifierType").val('2');
+
+        //$("#addIdentifiers").validate({
+        //    errorPlacement: function ($errorLabel, $element) {
+
+        //        var $elementToInsertAfter = $element;
+        //        if ($element.prop("type") === "radio") {
+        //            $elementToInsertAfter = $element.closest(".controls");
+        //        }
+
+        //        $errorLabel.insertAfter($elementToInsertAfter);
+        //    },
+
+        //    submitHandler: function (form) {
+        //        alert("This is a valid form!");
+        //    }
+        //});
     });
 </script>
 
+    @section addIdentifiers
+    {
+        <div class="section" id="addIdentifiers">
+            @using (Html.BeginForm("Import", "bloomberg", FormMethod.Post, new {enctype = "multipart/form-data"}))
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="file" class="btn btn-default btn-xs col-md-9 col-md-pull-1 col-md-offset-1" style="display: inline;" name="csvIdentifierFileBase" id="csvIdentifierFileBase" />
+                    
+                        <input type="submit" class="btn btn-default btn-xs" name="action" value="Import" />
+                    </div>
+                </div>
+            }
+            @using (Html.BeginForm("AddIdentifier", "bloomberg", FormMethod.Post, new {id="addIdentifiers"}))
+            {
+                @Html.ValidationSummary(true)
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    @Html.LabelFor(m => m.Identifier, new {@class = "col-md-4 control-label"})
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.Identifier, true, null, new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="row">
+                    @Html.LabelFor(m => m.GoldKey, new {@class = "col-md-4 control-label"})
+                    <div class="col-md-8">
+                        @Html.EnumDropDownListFor(model => model.GoldKey, new {@class = "form-control"})
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-offset-3 col-md-12">
+                        <input type="submit" class="btn btn-default btn-sm" name="action" value="Add Identifier" />
+                    </div>
+                </div>
+            }
+        
 
-@section addIdentifiers
-{
-    <div class="section" id="addIdentifiers">
-        @* @using (Html.BeginForm("AddIdentifier", "Bloomberg", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))*@
-        @using(Html.BeginForm())
-        {
-        @Html.ValidationSummary(true)
-        @Html.AntiForgeryToken()
-        <div class="row">
-            @Html.LabelFor(m => m.Identifier, new { @class = "col-md-4 control-label" })
-            <div class="col-md-8">
-                @Html.TextBoxFor(m => m.Identifier, new { @class = "form-control" })
-            </div>
         </div>
-
-            <div class="row">
-                @Html.LabelFor(m => m.CrdId, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.TextBoxFor(m => m.CrdId, new { @class = "form-control" })
-                </div>
-            </div>
-            <br/>
-            <div class="row">
-                @Html.LabelFor(m => m.IdentifierType, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.EnumDropDownListFor(model => model.IdentifierType, new { @class="form-control" } )
-                </div>
-            </div>
-            <div class="row">
-                @Html.LabelFor(m => m.GoldKey, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.EnumDropDownListFor(model => model.GoldKey, new { @class = "form-control" })
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Add Identifier" />
-                </div>
-            </div>
-        }
-    </div>
-}
-@section identifierList
-{
-    <div class="section" id="identifierList">
+    }
+    @section identifierList
+    {
+        <div class="section" id="identifierList">
         @using (Html.BeginForm())
         {
-            <div class="row">
-                <div class="col-md-12">
-                    @{
-            List<SecurityRequest> tempval = Session["reqs"] as List<SecurityRequest>;
+        <div class="row">
+            <div class="col-md-12">
+                @{
+                    //List<SecurityRequest> tempval = Session["reqs"] as List<SecurityRequest>;
 
-            if (tempval != null)
-            {
-                @Html.ListBox("Identifiers", tempval.Select(item => new SelectListItem() { Text = (item.IdentifierType != 0) ? "/" + item.IdentifierType + "/" + item.Identifier : item.Identifier + " " + item.GoldKey, Value = item.Identifier }), new { @class = "col-md-11 control-label"})
-            }
-            else
-            {
-                @Html.ListBox("Identifiers", new List<SelectListItem>(), new { @class = "col-md-11 control-label"});
-            }
+                    if (Model.SecurityRequests != null)
+                    {
+                        //@Html.ListBox("Identifiers", Model.SecurityRequests.Select(item => new SelectListItem() { Text = (item.IdentifierType != 0) ? "/" + item.IdentifierType + "/" + item.Identifier : item.Identifier + " " + item.GoldKey, Value = item.Identifier }), new { @class = "form-control" })
+                        //@Html.ListBoxFor(model => model.SecurityRequests, Model.SecurityRequests.Select(i => new SelectListItem() {Text = (i.IdentifierType != 0) ? "/" + i.IdentifierType + "/" + i.Identifier : i.Identifier + " " + i.GoldKey, Value = i.Identifier}), new {@class = "form-control"})
+                        @Html.ListBoxFor(model => model.SecurityRequests, Model.SecurityRequests.Select(i => new SelectListItem() { Text = i.Identifier + " " + i.GoldKey, Value = i.Identifier + " " + i.GoldKey }), new { @class = "form-control" })
                     }
-                </div>
+                    else
+                    {
+                        @Html.ListBox("Identifiers", new List<SelectListItem>(), new {@class = "form-control"})
+                        ;
+                    }
+                }
+            </div>
+        </div>
+        <br />
+        <div class="row">
 
+            @Html.Label("Fields", new {@class = "col-md-1 control-label"})
+            <div class="col-md-10">
+                @Html.TextAreaFor(m => m.FieldsList, new {@class = "form-control"})
             </div>
-            <br />
-            <div class="row">
-
-                @Html.Label("Fields", new { @class = "col-md-1 control-label" })
-                <div class="col-md-10">
-                    @Html.TextAreaFor(m => m.FieldsList, new { @class = "form-control"})
-                </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <input type="submit" class="btn btn-default btn-sm" name="action" value="Submit Identifiers" />
+                <input type="submit" class="btn btn-default btn-sm" name="action" value="Clear Identifiers" />
+                <input type="submit" class="btn btn-default btn-sm" name="action" value="Delete Identifier" />
             </div>
-            <br />
-            <div class="row">
-                <div class="col-md-12">
-                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Submit Identifiers" />
-                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Clear Identifiers" />
-                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Delete Identifier" />
-                </div>
-            </div>
+        </div>
         }
     </div>
-}
+    }    
+
 
 @section bbResults
 {
-            @if (Model.ResponseContract != null)
-            {
-                var attr = new Dictionary<string, object> {{"style", "width:100%"}};
-                var securityList = Model.ResponseContract.SecurityData.Select(m => m).AsQueryable();
+        @if (Model.ResponseContract != null)
+        {
+            var attr = new Dictionary<string, object> {{"style", "width:100%"}};
+            var securityList = Model.ResponseContract.SecurityData.Select(m => m).AsQueryable();
+                
+            //NOTE: This infragistics component dll is NOT compatible with MVC v5 dll's so if
+            // an upgrade to a newer version of MVC occurs this control must be swapped out 
+            // with something else
+                
+            @(Html.Infragistics().Grid<Security>(securityList)
+                .ID("securityList")
+                .AutoGenerateColumns(false)
+                .AutoGenerateLayouts(false)
+                .Width("95%")
+                .FixedHeaders(false)
+                .Columns(column =>
+                {
+                    column.For(x => x.Identifier).HeaderText("Identifier").Width("150px");
+                    column.For(x => x.CrdId).HeaderText("CRD Id").Width("150px");
+                    column.For(s => s.FieldList).HeaderText("Fields").Width("225px")
+                        .Template("{{if ${FieldList} != null }}" +
+                                "<div class='tree'><ul><li>Fields" +
+                                "<ul>{{each ${FieldList} }}" +
+                                "<li>${FieldList.FieldId}: ${FieldList.FieldValue}</li>" +
+                                "{{/each}}" +
+                                "</ul></li></ul></div>{{/if}}");
+                    column.For(s => s.FieldExceptionList).HeaderText("Field Exceptions").Width("225px")
+                        .Template("{{if ${FieldExceptionList} != null }}<div class='tree'><ul>" +
+                                    "{{each ${FieldExceptionList} }}" +
+                                        "<li>ErrorInfo: ${FieldExceptionList.FieldId}" +
+                                        "<ul>" +
+                                        "<li>Source: ${FieldExceptionList.ErrorInfo.Source}</li>" +
+                                        "<li>Code: ${FieldExceptionList.ErrorInfo.Code}</li>" +
+                                        "<li>Category: ${FieldExceptionList.ErrorInfo.Category}</li>" +
+                                        "<li>Message: ${FieldExceptionList.ErrorInfo.Message}</li>" +
+                                        "<li>Subcategory: ${FieldExceptionList.ErrorInfo.Subcategory}</li>" +
+                                        "</ul></li>" +
+                                    "{{/each}}</li></ul>" +
+                                    "</div>{{/if}}");
+                    column.For(s => s.SecurityError).HeaderText("Security Error").Width("225px")
+                        .Template("{{if ${SecurityError} != null }}<div class='tree'><ul>" +
+                                        "<li>Security Error:" +
+                                        "<ul>" +
+                                        "<li>Source: ${SecurityError.Source}</li>" +
+                                        "<li>Code: ${SecurityError.Code}</li>" +
+                                        "<li>Category: ${SecurityError.Category}</li>" +
+                                        "<li>Message: ${SecurityError.Message}</li>" +
+                                        "<li>Subcategory: ${SecurityError.Subcategory}</li>" +
+                                        "</ul></li>" +
+                                    "</li></ul>" +
+                                    "</div>{{/if}}");
+                })
 
-                @(Html.Infragistics().Grid<Security>(securityList)
-                  .ID("securityList")
-                  .AutoGenerateColumns(false)
-                  .AutoGenerateLayouts(false)
-                  .Width("95%")
-                  .FixedHeaders(false)
-                  .Columns(column =>
-                  {
-                      column.For(x => x.Identifier).HeaderText("Identifier").Width("150px");
-                      column.For(x => x.CrdId).HeaderText("CRD Id").Width("150px");
-                      column.For(s => s.FieldList).HeaderText("Fields").Width("225px")
-                          .Template("{{if ${FieldList} != null }}" +
-                                    "<div class='tree'><ul><li>Fields" +
-                                    "<ul>{{each ${FieldList} }}" +
-                                    "<li>${FieldList.FieldId}: ${FieldList.FieldValue}</li>" +
-                                    "{{/each}}" +
-                                    "</ul></li></ul></div>{{/if}}");
-                      column.For(s => s.FieldExceptionList).HeaderText("Field Exceptions").Width("225px")
-                          .Template("{{if ${FieldExceptionList} != null }}<div class='tree'><ul>" +
-                                        "{{each ${FieldExceptionList} }}" +
-                                            "<li>ErrorInfo: ${FieldExceptionList.FieldId}" +
-                                            "<ul>" +
-                                            "<li>Source: ${FieldExceptionList.ErrorInfo.Source}</li>" +
-                                            "<li>Code: ${FieldExceptionList.ErrorInfo.Code}</li>" +
-                                            "<li>Category: ${FieldExceptionList.ErrorInfo.Category}</li>" +
-                                            "<li>Message: ${FieldExceptionList.ErrorInfo.Message}</li>" +
-                                            "<li>Subcategory: ${FieldExceptionList.ErrorInfo.Subcategory}</li>" +
-                                            "</ul></li>" +
-                                        "{{/each}}</li></ul>" +
-                                        "</div>{{/if}}");
-                      column.For(s => s.SecurityError).HeaderText("Security Error").Width("225px")
-                          .Template("{{if ${SecurityError} != null }}<div class='tree'><ul>" +
-                                            "<li>Security Error:" +
-                                            "<ul>" +
-                                            "<li>Source: ${SecurityError.Source}</li>" +
-                                            "<li>Code: ${SecurityError.Code}</li>" +
-                                            "<li>Category: ${SecurityError.Category}</li>" +
-                                            "<li>Message: ${SecurityError.Message}</li>" +
-                                            "<li>Subcategory: ${SecurityError.Subcategory}</li>" +
-                                            "</ul></li>" +
-                                        "</li></ul>" +
-                                        "</div>{{/if}}");
-                  })
-
-        .Features(features => features.Sorting().Type(OpType.Local))
-        .DataBind()
-        .Render())
-            }
+            .Features(features => features.Sorting().Type(OpType.Local))
+            .DataBind()
+            .Render())
+        }
 }

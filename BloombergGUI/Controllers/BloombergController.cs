@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,88 +15,121 @@ using BloombergWebAPICore;
 using BloombergWebAPICore.Dto;
 using BloombergWebAPICore.IWebApi;
 using Core.MVC;
+using CsvHelper;
 using Newtonsoft.Json;
 
 namespace BloombergGUI.Controllers
 {
     public class BloombergController : Controller
     {
-        private List<SecurityRequest> reqs = null; 
-        private List<string> fields = WebConfigurationManager.AppSettings["SecurityFields"].Split(',').ToList();
+        private List<SecurityRequest> reqs = null;
+        private List<string> fields = null;//WebConfigurationManager.AppSettings["SecurityFields"].Split(',').ToList();
 
-        public ActionResult Index()
+
+        public ActionResult Index(SecurityViewModel securityViewModel)
         {
-            //Response.Write("IS AUTH: "+HttpContext.User.Identity.IsAuthenticated + " Username: " + HttpContext.User.Identity.Name);
-            //Response.Write("AUTH TYPE: "+HttpContext.User.Identity.AuthenticationType);
-            //fields = WebConfigurationManager.AppSettings["SecurityFields"].Split(',').ToList();
-            // need an empty object to fillin enumerated types
-            SecurityViewModel emptySecurityViewModel = new SecurityViewModel {FieldsList = String.Join(",",fields)};
-            return View(emptySecurityViewModel);
-            //return View();
+            if (GetViewModel() == null)
+                SaveViewModel(securityViewModel);
+            else
+                securityViewModel = GetViewModel();
+
+            if (String.IsNullOrWhiteSpace(securityViewModel.FieldsList))
+                securityViewModel.FieldsList = WebConfigurationManager.AppSettings["SecurityFields"];
+
+            SaveViewModel(securityViewModel);
+            return View(securityViewModel);
         }
 
         [HttpPost]
         [MultiButton(MatchFormKey = "action", MatchFormValue = "Add Identifier")]
         public ActionResult AddIdentifier(SecurityViewModel securityViewModel)
         {
-
+            string fieldList = "";
             if (ModelState.IsValid)
             {
-                if (Session["reqs"] != null)
-                    reqs = (List<SecurityRequest>) Session["reqs"];
+                if (GetViewModel() != null)
+                {
+                    reqs = GetViewModel().SecurityRequests ?? new List<SecurityRequest>();
+                }
+
+                if (String.IsNullOrWhiteSpace(GetViewModel().FieldsList))
+                    fieldList = WebConfigurationManager.AppSettings["SecurityFields"];
                 else
-                    reqs = new List<SecurityRequest>();
+                    fieldList = GetViewModel().FieldsList;
 
                 // add to list box and global var
                 reqs.Add(new SecurityRequest()
                 {
                     Identifier = securityViewModel.Identifier,
-                    CrdId = securityViewModel.CrdId,
+                    //CrdId = securityViewModel.CrdId,
                     GoldKey = securityViewModel.GoldKey,
-                    IdentifierType = securityViewModel.IdentifierType
+                    //IdentifierType = securityViewModel.IdentifierType
                 });
 
-                Session["reqs"] = reqs;
                 // clears the form values before returning
                 this.ModelState.Clear();
-                securityViewModel = new SecurityViewModel { FieldsList = String.Join(",", fields) };
+                securityViewModel = new SecurityViewModel { FieldsList = fieldList, SecurityRequests = reqs };
+                // set the view model to storage
+                SaveViewModel(securityViewModel);
+                return View("Index", GetViewModel());
             }
-
-            return View("Index",securityViewModel);
+            return RedirectToAction("Index", GetViewModel());
 
         }
 
         [HttpPost]
         [MultiButton(MatchFormKey = "action", MatchFormValue = "Clear Identifiers")]
-        public ActionResult ClearIdentifiers()
+        public ActionResult ClearIdentifiers(SecurityViewModel securityViewModel)
         {
-            Session["reqs"] = null;
-            return RedirectToAction("Index");
+            // clear object and reset fields list
+            securityViewModel.FieldsList = WebConfigurationManager.AppSettings["SecurityFields"];
+            SaveViewModel(securityViewModel);
+
+            return View("Index", GetViewModel());
         }
 
         [HttpPost]
         [MultiButton(MatchFormKey = "action", MatchFormValue = "Delete Identifier")]
-        public ActionResult DeleteIdentifer()
+        public ActionResult DeleteIdentifer(FormCollection collection, SecurityViewModel securityViewModel)
         {
-            string id = Request["Identifiers"];
-            reqs = Session["reqs"] as List<SecurityRequest>;
+            if (collection["SecurityRequests"] != null)
+            {
+                var ids = (collection["SecurityRequests"].Count() > 1)
+                    ? collection["SecurityRequests"].Split(',')
+                    : new string[] {collection["SecurityRequests"][0].ToString()};
+                reqs = GetViewModel().SecurityRequests;
+                if (ids.Count() > 1)
+                    foreach (var id in ids)
+                    {
+                        var identifier = id.Split(' ')[0];
+                        var key = EnumLookup.GoldKeyName.FirstOrDefault(x => x.Value.ToUpper() == id.Split(' ')[1]).Key;
+                        reqs.RemoveAt(reqs.FindIndex(m => m.Identifier == identifier && m.GoldKey == (GoldKey) key));
+                    }
+                else
+                {
+                    var identifier = ids[0].Split(' ')[0];
+                    var key = EnumLookup.GoldKeyName.FirstOrDefault(x => x.Value.ToUpper() == ids[0].Split(' ')[1]).Key;
 
-            reqs.RemoveAt(reqs.FindIndex(m => m.Identifier == id));
+                    reqs.RemoveAt(reqs.FindIndex(m => m.Identifier == identifier && m.GoldKey == (GoldKey) key));
+                }
 
-            Session["reqs"] = reqs;
-
-            SecurityViewModel viewModel = new SecurityViewModel();
-            viewModel.FieldsList = String.Join(",", fields);
-            return View("Index", viewModel);
+                securityViewModel = new SecurityViewModel
+                {
+                    FieldsList = String.Join(",", securityViewModel.FieldsList),
+                    SecurityRequests = reqs
+                };
+                SaveViewModel(securityViewModel);
+            }
+            return View("Index", GetViewModel());
         }
 
         [HttpPost]
         [MultiButton(MatchFormKey = "action", MatchFormValue = "Submit Identifiers")]
-        public ActionResult SubmitIdentifiers()
+        public ActionResult SubmitIdentifiers(SecurityViewModel securityViewModel)
         {
-            //fields = WebConfigurationManager.AppSettings["SecurityFields"].Split(',').ToList();
             List<string> fieldList = Request["FieldsList"].Split(',').ToList();
-            reqs = Session["reqs"] as List<SecurityRequest>;
+
+            reqs = GetViewModel().SecurityRequests;
 
             var oRefContract = new ReferenceDataRequestContract()
             {
@@ -144,9 +178,62 @@ namespace BloombergGUI.Controllers
             //        Response.Write(String.Format("{0}:{1}<br/>", header.Key, header.Value.FirstOrDefault()));
             //}
 
-            SecurityViewModel viewModel = new SecurityViewModel {ResponseContract = contract};
-            viewModel.FieldsList = String.Join(",", fieldList);
-            return View("Index",viewModel);
+            //SecurityViewModel viewModel = new SecurityViewModel {ResponseContract = contract};
+            securityViewModel.ResponseContract = contract;
+            securityViewModel.SecurityRequests = reqs;
+            securityViewModel.FieldsList = String.Join(",", fieldList);
+            SaveViewModel(securityViewModel);
+            return View("Index", GetViewModel());
+        }
+
+        [HttpPost]
+        [MultiButton(MatchFormKey = "action", MatchFormValue = "Import")]
+        public ActionResult Import(HttpPostedFileBase csvIdentifierFileBase, SecurityViewModel securityViewModel)
+        {
+            string fieldList = "";
+            if (csvIdentifierFileBase != null)
+            {
+                ICsvParser csvParser = new CsvParser(new StreamReader(csvIdentifierFileBase.InputStream));
+                var csvReader = new CsvReader(csvParser);
+                List<SecurityRequest> importlist = new List<SecurityRequest>();
+                if (GetViewModel() != null)
+                {
+                    reqs = GetViewModel().SecurityRequests ?? new List<SecurityRequest>();
+                }
+                if (String.IsNullOrWhiteSpace(GetViewModel().FieldsList))
+                    fieldList = WebConfigurationManager.AppSettings["SecurityFields"];
+                else
+                    fieldList = GetViewModel().FieldsList;
+
+                while (csvReader.Read())
+                {
+                    var identifier = csvReader.GetField<string>(0);
+                    var goldkey = csvReader.GetField<string>(1);
+                    var val =
+                        EnumLookup.GoldKeyName.FirstOrDefault(x => x.Value.ToLower().Contains(goldkey.ToLower())).Key;
+                    importlist.Add(new SecurityRequest() {Identifier = identifier, GoldKey = (GoldKey) val});
+                }
+
+                foreach (var item in importlist)
+                    reqs.Add(item);
+
+                securityViewModel.SecurityRequests = reqs;
+                securityViewModel.FieldsList = String.Join(",", fieldList);
+                //store the model
+                SaveViewModel(securityViewModel);
+            }
+            return View("Index", GetViewModel());
+        }
+
+        // mimic persistant storage
+        private SecurityViewModel GetViewModel()
+        {
+            return Session["model"] as SecurityViewModel;
+        }
+
+        private void SaveViewModel(SecurityViewModel model)
+        {
+            Session["Model"] = model;
         }
     }
 }
