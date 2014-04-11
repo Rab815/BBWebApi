@@ -79,5 +79,26 @@ namespace Core.MVC
                 Convert.ToString(value)).GetCustomAttributes(typeof (DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : Convert.ToString(value);
         }
+
+        public static SelectList ToSelectList<T>(this T enumeration, string selected)
+        {
+            var source = Enum.GetValues(typeof(T));
+
+            var items = new Dictionary<object, string>();
+
+            var displayAttributeType = typeof(DisplayAttribute);
+
+            foreach (var value in source)
+            {
+                FieldInfo field = value.GetType().GetField(value.ToString());
+
+                DisplayAttribute attrs = (DisplayAttribute)field.
+                              GetCustomAttributes(displayAttributeType, false).First();
+
+                items.Add(value, attrs.GetName());
+            }
+
+            return new SelectList(items, "Key", "Value", selected);
+        }
     }
 }

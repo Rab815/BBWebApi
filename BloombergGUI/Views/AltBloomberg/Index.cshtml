@@ -1,0 +1,245 @@
+﻿@using System.Web.Mvc.Html
+@using BloombergWebAPICore
+@using BloombergWebAPICore.Dto
+@using Core.MVC
+@using Infragistics.Web.Mvc
+@using Microsoft.Ajax.Utilities
+@using HtmlHelperExtensions = Core.MVC.HtmlHelperExtensions
+@model BloombergGUI.Models.SecurityViewAltModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AltLayout.cshtml";
+}
+<script>
+    //$("#addItem").click(function () {
+    //    var txt = $("#appName");
+    //    var svc = $(txt).val();  //Its Let you know the textbox's value   
+    //    var lst = $("#serverSpecification_applications");
+    //    var ul = $("#itemList");
+    //    var options = $("#serverSpecification_applications option");
+    //    var iList = $("#itemList li");
+    //    var alreadyExist = false;
+    //    $(options).each(function () {
+    //        if ($(this).val() == svc) {
+    //            alreadyExist = true;
+    //            txt.val("");
+    //            return alreadyExist;
+    //        }
+    //    });
+    //    if (!alreadyExist) {
+    //        $(lst).append('<option value="' + svc + '" selected=true>' + svc + '</option>');
+    //        $(ul).append('<li id="' + svc + '"><label>' + svc + '<input type="checkbox" id="' + svc + '" onclick="removeItem(this.id)"/></label>')
+    //        txt.val("");
+    //        return false;
+    //    }
+    //});
+    $(function () {
+        $("button[id$='addidentifier']").click(function (evt) {
+            evt.preventDefault();
+            var postdata = {
+                identifier: $('#Identifier').val(),
+                goldkey: $('#Goldkey').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: 'altbloomberg/AddIdentifier',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                //processData: false,
+                //data: postdata, // doesn't even call controller (string postdata)
+                //data: JSON.stringify(postdata), // calls controler (string postdata) but is null
+                data: JSON.stringify({ postdata: postdata }),
+                success: function(data) {
+                     alert('data: ' + data);
+                },
+                failure: function(a,b,c) {
+                    alert(a);
+                }
+            });
+        });
+
+        $("button[id$='uploadfile']").click(function (evt) {
+            //alert("upload file");
+            //var file1 = $('#csvIdentifierFileBase').val();
+            // Access in parameterless controller method Via Request.Files
+            //var formData = new FormData();
+            //var opmlFile = $('#csvIdentifierFileBase')[0];
+            //formData.append("opmlFile", opmlFile.files[0]);
+
+            //var xhr = new XMLHttpRequest();
+            //xhr.open('POST', 'altbloomberg/Import');
+            //xhr.send(formData);
+            //xhr.onreadystatechange = function() {
+            //    if (xhr.readyState == 4 && xhr.status == 200) {
+            //        alert(xhr.responseText);
+            //    }
+            //};
+
+            evt.preventDefault();
+            var $newForm = $('<form>', {
+                'action': 'altbloomberg/Import',
+                'method': 'post',
+                'enctype': 'multipart/form-data',
+                'target':'_top'
+            }).append($("#csvIdentifierFileBase")).appendTo('body').submit().remove();
+
+
+            //var file_data = $("#csvIdentifierFileBase").prop("files")[0];   // Getting the properties of file from file field
+            //var form_data = new FormData();                  // Creating object of FormData class
+            //form_data.append("file", file_data);            // Appending parameter named file with properties of file_field to form_data
+            ////form_data.append("user_id", 123);             // Adding extra parameters to form_data
+            //$.ajax({
+            //    url: "altbloomberg/Import",
+            //    dataType: 'script',
+            //    cache: false,
+            //    contentType: false,
+            //    processData: false,
+            //    data: form_data,                            // Setting the data attribute of ajax with file_data
+            //    type: 'post'
+            //});
+        });
+
+    });
+    
+</script>
+<style>
+    .row {
+        margin-bottom: 5px;
+    }
+</style>
+@*@using (Ajax.BeginForm("Import", "bloomberg", new AjaxOptions() { HttpMethod = "POST" }, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <input type="file" class="btn btn-default btn-xs col-md-9 col-md-pull-1 col-md-offset-1" style="display: inline;" name="csvIdentifierFileBase" id="csvIdentifierFileBase" />
+
+                <input type="submit" class="btn btn-default btn-xs" name="action" value="Import" />
+            </div>
+        </div>
+    }*@
+
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-4">
+            <div class="row">
+                <label class="col-md-4 control-label" for="Identifier">Identifier</label>
+                <div class="col-md-8">
+                    <input type="text" id="Identifier" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-4 control-label" for="Identifier">Gold Key</label>
+                <div class="col-md-8">
+                    @{
+                        const GoldKey enums = new GoldKey();
+                    }
+                    @Html.DropDownList("Goldkey", enums.ToSelectList("none"),new{@class="form-control"})
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-offset-3 col-md-12">
+                    <button id="addidentifier" class="btn btn-default btn-sm" name="action" value="Add Identifier" >Add Identifier</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="file" name="csvIdentifierFileBase" id="csvIdentifierFileBase" class="btn btn-default btn-xs col-md-9 col-md-pull-1 col-md-offset-1" style="display: inline;" />
+
+                    <button id="uploadfile" class="btn btn-default btn-xs" name="action" value="Import" >Import</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-12">
+                    @*@{
+                        @Html.ListBoxFor(m => m.SecurityRequests, new SelectList(Model.SecurityRequests, "Identifier", "GoldKey"), new { @class = "form-control" })
+                    }*@
+                    
+                    @(Model.SecurityRequests != null ? Html.ListBoxFor(model => model.SecurityRequests, Model.SecurityRequests.Select(i => new SelectListItem() {Text = i.Identifier + " " + i.GoldKey, Value = i.Identifier + " " + i.GoldKey}), new {@class = "form-control"}) : Html.ListBox("Identifiers", new List<SelectListItem>(), new {@class = "form-control"}))
+                    
+                </div>
+            </div>
+            <br />
+            <div class="row">
+
+                @Html.Label("Fields", new { @class = "col-md-1 control-label" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(m => m.FieldsList, new { @class = "form-control" })
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Submit Identifiers" />
+                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Clear Identifiers" />
+                    <input type="submit" class="btn btn-default btn-sm" name="action" value="Delete Identifier" />
+                </div>
+            </div>
+           
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            @if (@Model.ResponseContract != null)
+            {
+                var attr = new Dictionary<string, object> { { "style", "width:100%" } };
+                var securityList = Model.ResponseContract.SecurityData.Select(m => m).AsQueryable();
+
+                //NOTE: This infragistics component dll is NOT compatible with MVC v5 dll's so if
+                // an upgrade to a newer version of MVC occurs this control must be swapped out
+                // with something else
+
+                @(Html.Infragistics().Grid<Security>(securityList)
+                .ID("securityList")
+                .AutoGenerateColumns(false)
+                .AutoGenerateLayouts(false)
+                .Width("95%")
+                .FixedHeaders(false)
+                .Columns(column =>
+                {
+                    column.For(x => x.Identifier).HeaderText("Identifier").Width("150px");
+                    column.For(x => x.CrdId).HeaderText("CRD Id").Width("150px");
+                    column.For(s => s.FieldList).HeaderText("Fields").Width("225px")
+                        .Template("{{if ${FieldList} != null }}" +
+                                "<div class='tree'><ul><li>Fields" +
+                                "<ul>{{each ${FieldList} }}" +
+                                "<li>${FieldList.FieldId}: ${FieldList.FieldValue}</li>" +
+                                "{{/each}}" +
+                                "</ul></li></ul></div>{{/if}}");
+                    column.For(s => s.FieldExceptionList).HeaderText("Field Exceptions").Width("225px")
+                        .Template("{{if ${FieldExceptionList} != null }}<div class='tree'><ul>" +
+                                    "{{each ${FieldExceptionList} }}" +
+                                        "<li>ErrorInfo: ${FieldExceptionList.FieldId}" +
+                                        "<ul>" +
+                                        "<li>Source: ${FieldExceptionList.ErrorInfo.Source}</li>" +
+                                        "<li>Code: ${FieldExceptionList.ErrorInfo.Code}</li>" +
+                                        "<li>Category: ${FieldExceptionList.ErrorInfo.Category}</li>" +
+                                        "<li>Message: ${FieldExceptionList.ErrorInfo.Message}</li>" +
+                                        "<li>Subcategory: ${FieldExceptionList.ErrorInfo.Subcategory}</li>" +
+                                        "</ul></li>" +
+                                    "{{/each}}</li></ul>" +
+                                    "</div>{{/if}}");
+                    column.For(s => s.SecurityError).HeaderText("Security Error").Width("225px")
+                        .Template("{{if ${SecurityError} != null }}<div class='tree'><ul>" +
+                                        "<li>Security Error:" +
+                                        "<ul>" +
+                                        "<li>Source: ${SecurityError.Source}</li>" +
+                                        "<li>Code: ${SecurityError.Code}</li>" +
+                                        "<li>Category: ${SecurityError.Category}</li>" +
+                                        "<li>Message: ${SecurityError.Message}</li>" +
+                                        "<li>Subcategory: ${SecurityError.Subcategory}</li>" +
+                                        "</ul></li>" +
+                                    "</li></ul>" +
+                                    "</div>{{/if}}");
+                })
+
+            .Features(features => features.Sorting().Type(OpType.Local))
+            .DataBind()
+            .Render())
+            }
+        </div>
+    </div>
+}

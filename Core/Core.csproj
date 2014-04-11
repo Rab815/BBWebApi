@@ -97,24 +97,12 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="MVC\Attributes.cs" />
     <Compile Include="MVC\HTMLHelperExtensions.cs" />
-    <Compile Include="MVC\MvcResources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MVC\System.Web.Mvc.Properties.MvcResources.resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>System.Web.Mvc.Properties.MvcResources.resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MVC\System.Web.Mvc.Properties.MvcResources.resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>System.Web.Mvc.Properties.MvcResources.resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

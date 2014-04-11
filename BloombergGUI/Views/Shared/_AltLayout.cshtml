@@ -1,0 +1,39 @@
+﻿@using System.Web.Optimization
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>@ViewBag.Title - Bloomberg Prototype</title>
+    <!-- jQuery moved to head due to requirement for Infragistics grid -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/Scripts/jquery.validate.min.js")
+    @Scripts.Render("~/Scripts/jquery.validate.unobtrusive.min.js")
+
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Styles.Render("~/Content/Infragistics/css/structure/bundle")
+    @Styles.Render("~/Content/Infragistics/css/themes/metro/bundle")
+    @Styles.Render("~/Content/grid")
+    @Scripts.Render("~/bundles/infragisticsgrid")
+
+    @Styles.Render("~/Content/foundation/css")
+    @Styles.Render("~/Content/css")
+
+    <!-- Bootstrap -->
+    <link href="~/Content/themes/base/minified/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+    
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+</body>
+</html>
