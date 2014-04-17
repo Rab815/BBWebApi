@@ -41,6 +41,7 @@ namespace BloombergWebAPICore.IWebApi
         public string Identifier;
         public IdentifierType IdentifierType;
         public GoldKey GoldKey;
+        public string GoldkeyText;
         public string CrdId;
     }
 

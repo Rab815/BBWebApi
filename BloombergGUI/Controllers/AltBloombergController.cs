@@ -32,18 +32,27 @@ namespace BloombergGUI.Controllers
                     FieldsList = WebConfigurationManager.AppSettings["SecurityFields"]
                 };
                         
-            return View(securityViewModel);
+            return View("Index",securityViewModel);
         }
 
         [System.Web.Http.HttpPost]
-        public ActionResult AddIdentifier(dynamic postdata)
+        public ActionResult AddIdentifier(AddIdentifierInput postdata)
         {
 
-            SecurityViewAltModel securityViewModel = new SecurityViewAltModel { FieldsList = WebConfigurationManager.AppSettings["SecurityFields"] };
+            //SecurityViewAltModel securityViewModel = new SecurityViewAltModel { FieldsList = WebConfigurationManager.AppSettings["SecurityFields"] };
+            SecurityViewAltModel securityViewModel = GetViewModel();
+            securityViewModel = securityViewModel ?? new SecurityViewAltModel { FieldsList = WebConfigurationManager.AppSettings["SecurityFields"] };
             securityViewModel.SecurityRequests = securityViewModel.SecurityRequests ?? new List<SecurityRequest>();
-            securityViewModel.SecurityRequests.Add(new SecurityRequest(){ Identifier = postdata.Identifier, GoldKey = postdata.GoldKey });
+            SecurityRequest newone = new SecurityRequest()
+            {
+                Identifier = postdata.Identifier,
+                GoldKey = postdata.GoldKey,
+                GoldkeyText = EnumLookup.GoldKeyName[postdata.GoldKey]
+            };
+            securityViewModel.SecurityRequests.Add(newone);
             SaveViewModel(securityViewModel);
-            return RedirectToAction("Index");
+            var redirectUrl = new UrlHelper(Request.RequestContext).Action("Index", "AltBloomberg");
+            return Json(new { Url = redirectUrl, Requests = newone });
 
         }
 
@@ -59,23 +68,52 @@ namespace BloombergGUI.Controllers
             return View("Index", GetViewModel());
         }
 
+        [System.Web.Mvc.HttpPost]
+        [MultiButton(MatchFormKey = "action", MatchFormValue = "Delete Identifier")]
+        public ActionResult DeleteIdentifer(FormCollection collection)
+        {
+            SecurityViewAltModel securityViewModel = GetViewModel();
+            List<SecurityRequest> reqs = null;
+            if (collection["SecurityRequests"] != null)
+            {
+                var ids = (collection["SecurityRequests"].Count() > 1)
+                    ? collection["SecurityRequests"].Split(',')
+                    : new string[] { collection["SecurityRequests"][0].ToString() };
+                reqs = securityViewModel.SecurityRequests;
+                //if (ids.Count() > 1)
+                    foreach (var id in ids)
+                    {
+                        var identifier = id.Split(' ')[0];
+                        var key = EnumLookup.GoldKeyName.FirstOrDefault(x => String.Equals(x.Value, id.Split(' ')[1], StringComparison.CurrentCultureIgnoreCase)).Key;
+                        reqs.RemoveAt(reqs.FindIndex(m => m.Identifier == identifier && m.GoldKey == (GoldKey)key));
+                    }
+                //else
+                //{
+                //    var identifier = ids[0].Split(' ')[0];
+                //    var key = EnumLookup.GoldKeyName.FirstOrDefault(x => String.Equals(x.Value, ids[0].Split(' ')[1], StringComparison.CurrentCultureIgnoreCase)).Key;
+
+                //    reqs.RemoveAt(reqs.FindIndex(m => m.Identifier == identifier && m.GoldKey == (GoldKey)key));
+                //}
+
+                securityViewModel = new SecurityViewAltModel
+                {
+                    FieldsList = String.Join(",", securityViewModel.FieldsList),
+                    SecurityRequests = reqs
+                };
+                SaveViewModel(securityViewModel);
+            }
+            return View("Index", GetViewModel());
+        }
+
         [System.Web.Http.HttpPost]
         public ActionResult Import(HttpPostedFileBase csvIdentifierFileBase)
         {
-            SecurityViewAltModel securityViewModel = new SecurityViewAltModel();
+            SecurityViewAltModel securityViewModel = GetViewModel() ?? new SecurityViewAltModel();
             string fieldList = "";
             HttpResponseMessage result = null;
-            HttpPostedFileBase file1 = Request.Files[0]; //Uploaded file
-            //Use the following properties to get file's name, size and MIMEType
-            //int fileSize = file.ContentLength;
-            //string fileName = file.FileName;
-            //string mimeType = file.ContentType;
-            //System.IO.Stream fileContent = file.InputStream;
+            //HttpPostedFileBase file1 = Request.Files[0]; //Uploaded file
 
-            //var httpRequest = HttpContext.Current.Request;
-            //if (csvIdentifierFileBase != null)
-            //{
-            ICsvParser csvParser = new CsvParser(new StreamReader(file1.InputStream));
+            ICsvParser csvParser = new CsvParser(new StreamReader(csvIdentifierFileBase.InputStream));
             var csvReader = new CsvReader(csvParser);
             List<SecurityRequest> importlist = new List<SecurityRequest>();
 
@@ -84,11 +122,13 @@ namespace BloombergGUI.Controllers
                 var identifier = csvReader.GetField<string>(0);
                 var goldkey = csvReader.GetField<string>(1);
                 var val = EnumLookup.GoldKeyName.FirstOrDefault(x => x.Value.ToLower().Contains(goldkey.ToLower())).Key;
-                importlist.Add(new SecurityRequest() { Identifier = identifier, GoldKey = (GoldKey)val });
+                importlist.Add(new SecurityRequest() { Identifier = identifier, GoldKey = (GoldKey)val, GoldkeyText = goldkey });
             }
 
+            if(securityViewModel.SecurityRequests == null)
+                securityViewModel.SecurityRequests = new List<SecurityRequest>();
 
-            securityViewModel.SecurityRequests = importlist;
+            securityViewModel.SecurityRequests.AddRange(importlist);
             securityViewModel.FieldsList = String.Join(",", fieldList);
             SaveViewModel(securityViewModel);
             return RedirectToAction("Index");
